@@ -26,19 +26,19 @@ inline Vector4 vec4n(float a0,float a1,float a2,float a3){
 }
 
 
-inline Vector2 vec2(float* data){
+inline Vector2 vec2(const float* data){
     Vector2 v;
     memcpy(v.r,data,sizeof(float) * 2);
     return v;
 }
 
-inline Vector3 vec3(float* data){
+inline Vector3 vec3(const float* data){
     Vector3 v;
     memcpy(v.r,data,sizeof(float) * 3);
     return v;
 }
 
-inline Vector4 vec4(float* data){
+inline Vector4 vec4(const float* data){
     Vector4 v;
     memcpy(v.r,data,sizeof(float) * 4);
     return v;
@@ -155,4 +155,8 @@ inline Vector4 mul44(Vector4 lhs,Vector4 rhs){
 inline Vector4 div4f(Vector4 vec,float f){
     float v[4] = {vec.x / f,vec.y / f,vec.z / f,vec.w /f};
     return vec4(v);
+}
+
+inline float dot4(Vector4 lhs,Vector4 rhs){
+    return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
 }

@@ -1,3 +1,6 @@
+#ifndef _vector_
+#define _vector_
+
 #include <stddef.h>
 
 typedef union _Vector2{
@@ -25,9 +28,9 @@ Vector2 vec2n(float a0,float a1);
 Vector3 vec3n(float a0,float a1,float a2);
 Vector4 vec4n(float a0,float a1,float a2,float a3);
 
-Vector2 vec2(float* data);
-Vector3 vec3(float* data);
-Vector4 vec4(float* data);
+Vector2 vec2(const float* data);
+Vector3 vec3(const float* data);
+Vector4 vec4(const float* data);
 
 Vector2 add2f(Vector2 vec,float f);
 Vector2 add22(Vector2 lhs,Vector2 rhs);
@@ -69,3 +72,7 @@ Vector4 mul4f(Vector4 vec,float f);
 Vector4 mul44(Vector4 lhs,Vector4 rhs);
 
 Vector4 div4f(Vector4 vec,float f);
+
+float dot4(Vector4 lhs,Vector4 rhs);
+
+#endif
