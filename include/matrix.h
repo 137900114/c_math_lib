@@ -81,4 +81,8 @@ Vector3 trans3point(const Mat4* mat,Vector3 v);
 //translate a vector3 value as a vector by a 4x4 transform matrix
 Vector3 trans3vec(const Mat4* mat,Vector3 v);
 
+
+void printm3(Mat3* mat);
+void printm4(Mat4* mat);
+
 #endif

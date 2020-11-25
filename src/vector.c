@@ -1,5 +1,6 @@
 #include "vector.h"
 #include <string.h>
+#include <stdio.h>
 
 inline Vector2 vec2n(float a0,float a1){
     Vector2 v;
@@ -159,4 +160,16 @@ inline Vector4 div4f(Vector4 vec,float f){
 
 inline float dot4(Vector4 lhs,Vector4 rhs){
     return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
+}
+
+void printv2(Vector2* vec){
+    printf("(%.4f,%.4f)",vec->x,vec->y);
+}
+
+void printv3(Vector3* vec){
+    printf("(%.4f,%.4f,%.4f)",vec->x,vec->y,vec->z);
+}
+
+void printv4(Vector4* vec){
+    printf("(%.4f,%.4f,%.4f,%.4f)",vec->x,vec->y,vec->z,vec->w);
 }

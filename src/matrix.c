@@ -1,6 +1,7 @@
 #include "matrix.h"
 #include <string.h>
 #include <math.h>
+#include <stdio.h>
 
 #ifndef PI
 #define PI 3.1415926536 
@@ -238,4 +239,19 @@ inline Vector3 trans3vec(const Mat4* mat,Vector3 v){
     Vector4 vv = vec4n(v.x,v.y,v.z,0.f);
     vv = mulm44(mat,vv);
     return vec3n(vv.x,vv.y,vv.z);
+}
+
+void printm3(Mat3* mat){
+    printf("%f,%f,%f\n%f,%f,%f\n%f,%f,%f\n",
+            mat->a[0][0],mat->a[0][1],mat->a[0][2],
+            mat->a[1][0],mat->a[1][1],mat->a[1][2],
+            mat->a[2][0],mat->a[2][1],mat->a[2][2]);
+}
+
+void printm4(Mat4* mat){
+    printf("%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n",
+            mat->a[0][0],mat->a[0][1],mat->a[0][2],mat->a[0][3],
+            mat->a[1][0],mat->a[1][1],mat->a[1][2],mat->a[1][3],
+            mat->a[2][0],mat->a[2][1],mat->a[2][2],mat->a[2][3],
+            mat->a[3][0],mat->a[3][1],mat->a[3][2],mat->a[3][3]);
 }

@@ -75,4 +75,8 @@ Vector4 div4f(Vector4 vec,float f);
 
 float dot4(Vector4 lhs,Vector4 rhs);
 
+void printv2(Vector2* vec);
+void printv3(Vector3* vec);
+void printv4(Vector4* vec);
+
 #endif
