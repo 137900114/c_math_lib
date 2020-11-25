@@ -22,9 +22,9 @@ Mat3 mat3n(float a00,float a01,float a02,
            float a20,float a21,float a22){
     
     Mat3 mat;
-    mat.a[0][0] = a00,mat.a[0][1] = a00,mat.a[0][2] = a00,
-    mat.a[1][0] = a00,mat.a[1][1] = a00,mat.a[1][2] = a00,
-    mat.a[2][0] = a00,mat.a[2][1] = a00,mat.a[2][2] = a00;
+    mat.a[0][0] = a00,mat.a[0][1] = a01,mat.a[0][2] = a02,
+    mat.a[1][0] = a10,mat.a[1][1] = a11,mat.a[1][2] = a12,
+    mat.a[2][0] = a20,mat.a[2][1] = a21,mat.a[2][2] = a22;
 
     return mat;
 }
