@@ -7,12 +7,19 @@
 #define PI 3.1415926536 
 #endif
 
-Mat3 mat3(float* data){
+
+static inline int equals(float a,float b){
+    static const float tolerance = 1e-8;
+    float dis = a - b;
+    return dis * dis < tolerance;
+}
+
+Mat3 mat3(const float* data){
     Mat3 mat;
     memcpy(mat.r,data,sizeof(float) * 9);
     return mat;
 }
-Mat4 mat4(float* data){
+Mat4 mat4(const float* data){
     Mat4 mat;
     memcpy(mat.r,data,sizeof(float) * 16);
     return mat;
@@ -88,18 +95,157 @@ float mat3det(const Mat3* mat){
      + mat->a[0][2] * mat->a[1][0] * mat->a[2][1]
      - mat->a[0][2] * mat->a[1][1] * mat->a[2][0];
 }
-float mat4det(const Mat4* mat){
-    /*TODO*/
-    return 0;
+
+
+float mat4det_special_solver(const Mat4* mat){
+    return (mat->a[0][0] * mat->a[1][1] * mat->a[2][2] 
+     - mat->a[0][0] * mat->a[1][2] * mat->a[2][1] 
+     + mat->a[0][1] * mat->a[1][2] * mat->a[2][0]
+     - mat->a[0][1] * mat->a[1][0] * mat->a[2][2]
+     + mat->a[0][2] * mat->a[1][0] * mat->a[2][1]
+     - mat->a[0][2] * mat->a[1][1] * mat->a[2][0]) * mat->a[3][3];
 }
 
-Mat3 mat3inv(const Mat3* mat){
-    /*TODO*/
-    return mat3zero;
+static void add_matrix_row_to(Mat4* mat,int source,int dest,float scale){
+    for(int i = 0;i != 4;i++){
+        mat->a[dest][i] += mat->a[source][i] * scale;
+    }
 }
-Mat4 mat4inv(const Mat4* mat){
-    /*TODO*/
-    return mat4zero;
+
+static void scale_matrix_row(Mat4* mat,int dest,float scale){
+    for(int i = 0;i != 4;i++){
+        mat->a[dest][i] *= scale;
+    }
+}
+
+
+float mat4det_general_solver(const Mat4* mat){
+    Mat4 copy = mat4(mat->r);
+    int non0index = -1;
+    for(int i = 0;i != 4;i++){
+        if(equals(mat->a[i][0],0)){
+            non0index = i;
+            break;
+        }
+    }
+    if(non0index < 0) return 0;
+    if(non0index != 0){
+        add_matrix_row_to(&copy,non0index,0,1.);
+    }
+    for(int i = 1;i != 4;i++){
+        add_matrix_row_to(&copy,0,i,- copy.a[i][0] / copy.a[0][0]);
+    }
+
+    Mat3 submat = mat3n(copy.a[1][1],copy.a[1][2],copy.a[1][3],
+                        copy.a[2][1],copy.a[2][2],copy.a[2][3],
+                        copy.a[3][1],copy.a[3][2],copy.a[3][3]);
+    float detsub = mat3det(&submat);
+    return detsub * copy.a[0][0];
+}
+
+
+
+float mat4det(const Mat4* mat){
+    //special solver for special matrixs
+    if(equals(mat->a[3][0],0.) &&
+        equals(mat->a[3][1],0.) &&
+        equals(mat->a[3][2],0.)){
+        
+        return mat4det_special_solver(mat);
+    }else{
+        return mat4det_general_solver(mat);
+    }
+}
+
+M_BOOL mat3inv(const Mat3* mat,Mat3* output){
+    float matdet = mat3det(mat);
+    if(equals(matdet,0)) return M_FALSE;
+    float detinv = 1. / matdet;
+
+    output->a[0][0] = detinv * (mat->a[1][1]  * mat->a[2][2] - mat->a[1][2] * mat->a[2][1]);
+    output->a[0][1] =-detinv * (mat->a[0][1]  * mat->a[2][2] - mat->a[0][2] * mat->a[2][1]);
+    output->a[0][2] = detinv * (mat->a[0][1]  * mat->a[1][2] - mat->a[1][1] * mat->a[0][2]);
+    output->a[1][0] =-detinv * (mat->a[1][0]  * mat->a[2][2] - mat->a[2][0] * mat->a[1][2]);
+    output->a[1][1] = detinv * (mat->a[0][0]  * mat->a[2][2] - mat->a[0][2] * mat->a[2][0]);
+    output->a[1][2] =-detinv * (mat->a[0][0]  * mat->a[1][2] - mat->a[1][0] * mat->a[0][2]);
+    output->a[2][0] = detinv * (mat->a[1][0]  * mat->a[2][1] - mat->a[2][0] * mat->a[1][1]);
+    output->a[2][1] =-detinv * (mat->a[0][0]  * mat->a[2][1] - mat->a[2][0] * mat->a[0][1]);
+    output->a[2][2] = detinv * (mat->a[0][0]  * mat->a[1][1] - mat->a[1][0] * mat->a[0][1]);
+    return M_TRUE;
+}
+
+
+static M_BOOL mat4inv_special_solver(const Mat4* mat,Mat4* output){
+    float matdet = mat4det_special_solver(mat);
+    if(equals(matdet,0)) return M_FALSE;
+    float detinv = 1. / matdet *  mat->a[3][3];
+
+    output->a[0][0] = detinv * (mat->a[1][1]  * mat->a[2][2] - mat->a[1][2] * mat->a[2][1]);
+    output->a[0][1] =-detinv * (mat->a[0][1]  * mat->a[2][2] - mat->a[0][2] * mat->a[2][1]);
+    output->a[0][2] = detinv * (mat->a[0][1]  * mat->a[1][2] - mat->a[1][1] * mat->a[0][2]);
+    output->a[1][0] =-detinv * (mat->a[1][0]  * mat->a[2][2] - mat->a[2][0] * mat->a[1][2]);
+    output->a[1][1] = detinv * (mat->a[0][0]  * mat->a[2][2] - mat->a[0][2] * mat->a[2][0]);
+    output->a[1][2] =-detinv * (mat->a[0][0]  * mat->a[1][2] - mat->a[1][0] * mat->a[0][2]);
+    output->a[2][0] = detinv * (mat->a[1][0]  * mat->a[2][1] - mat->a[2][0] * mat->a[1][1]);
+    output->a[2][1] =-detinv * (mat->a[0][0]  * mat->a[2][1] - mat->a[2][0] * mat->a[0][1]);
+    output->a[2][2] = detinv * (mat->a[0][0]  * mat->a[1][1] - mat->a[1][0] * mat->a[0][1]);
+
+
+    output->a[3][0] = output->a[3][1] = output->a[3][2] = 0.f;
+    output->a[3][3] = 1. / mat->a[3][3];
+
+    output->a[0][3] =-(output->a[0][0] * mat->a[0][3] + output->a[0][1] * mat->a[1][3] + output->a[0][2] * mat->a[2][3]) /  mat->a[3][3];
+    output->a[1][3] =-(output->a[1][0] * mat->a[0][3] + output->a[1][1] * mat->a[1][3] + output->a[1][2] * mat->a[2][3]) /  mat->a[3][3];
+    output->a[2][3] =-(output->a[2][0] * mat->a[0][3] + output->a[2][1] * mat->a[1][3] + output->a[2][2] * mat->a[2][3]) /  mat->a[3][3];
+
+    return M_TRUE;
+}
+
+static M_BOOL mat4inv_general_solver(const Mat4* mat,Mat4* output){
+    *output = mat4i;
+    Mat4 copy = mat4(mat->r);
+    for(int col = 0;col != 4;col++){
+        int currrow = col;
+        if(equals(copy.a[currrow][col],0.)){
+            int non0index = -1;
+            for(int j = currrow + 1;j < 4;j++){
+                if(!equals(copy.a[j][col],0.)){
+                    non0index = j;
+                    break;
+                }
+            }
+            if(non0index < 0){
+                //the det of the matrix is 0,it is uninversable
+                return M_FALSE;
+            }
+            add_matrix_row_to(&copy,non0index,currrow,1.);
+            add_matrix_row_to(output,non0index,currrow,1.);
+        }
+
+        float scale = 1. / copy.a[currrow][col];
+        scale_matrix_row(&copy,currrow,scale);
+        scale_matrix_row(output,currrow,scale);
+
+        for(int j = 0;j < 4;j++){
+            if(j == currrow) continue;
+            float scale = - copy.a[j][col];
+            add_matrix_row_to(&copy,currrow,j,scale);
+            add_matrix_row_to(output,currrow,j,scale);
+        }
+    }
+    return M_TRUE;
+}
+
+
+M_BOOL mat4inv(const Mat4* mat,Mat4* output){
+    if(equals(mat->a[3][0],0.) &&
+        equals(mat->a[3][1],0.) &&
+        equals(mat->a[3][2],0.)){
+        
+        return mat4inv_special_solver(mat,output);
+    }else{
+        return mat4inv_general_solver(mat,output);
+    }
 }
 
 
@@ -242,16 +388,26 @@ inline Vector3 trans3vec(const Mat4* mat,Vector3 v){
 }
 
 void printm3(Mat3* mat){
-    printf("%f,%f,%f\n%f,%f,%f\n%f,%f,%f\n",
+    printf("%.4f,%.4f,%.4f\n%.4f,%.4f,%.4f\n%.4f,%.4f,%.4f\n",
             mat->a[0][0],mat->a[0][1],mat->a[0][2],
             mat->a[1][0],mat->a[1][1],mat->a[1][2],
             mat->a[2][0],mat->a[2][1],mat->a[2][2]);
 }
 
 void printm4(Mat4* mat){
-    printf("%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n",
+    printf("%.4f,%.4f,%.4f,%.4f\n%.4f,%.4f,%.4f,%.4f\n%.4f,%.4f,%.4f,%.4f\n%.4f,%.4f,%.4f,%.4f\n",
             mat->a[0][0],mat->a[0][1],mat->a[0][2],mat->a[0][3],
             mat->a[1][0],mat->a[1][1],mat->a[1][2],mat->a[1][3],
             mat->a[2][0],mat->a[2][1],mat->a[2][2],mat->a[2][3],
             mat->a[3][0],mat->a[3][1],mat->a[3][2],mat->a[3][3]);
+}
+
+
+Mat4 mat4perspect(float aspect,float near,float far,float fov){
+    float fovdiv2tan = tanf(fov / 360. * M_PI);
+    
+    return mat4n(1. / (fovdiv2tan * aspect),0.                     ,0.                ,0.,
+                 0.                        ,1./ fovdiv2tan         ,0.                ,0.,
+                 0.                        ,0.                     ,far / (far - near),near * far / (near - far),
+                 0.                        ,0.                     ,1.                ,0.);
 }

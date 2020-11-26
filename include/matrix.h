@@ -3,6 +3,10 @@
 
 #include "vector.h"
 
+typedef int M_BOOL;
+#define M_TRUE 1
+#define M_FALSE 0
+
 typedef union _Mat3{
     float r[9];
     float a[3][3];
@@ -14,8 +18,8 @@ typedef union _Mat4{
 } Mat4;
 
 
-Mat3 mat3(float* mat);
-Mat4 mat4(float* mat);
+Mat3 mat3(const float* mat);
+Mat4 mat4(const float* mat);
 
 Mat3 mat3n(float a00,float a01,float a02,
            float a10,float a11,float a12,
@@ -42,8 +46,8 @@ extern const Mat4 mat4zero;
 float mat3det(const Mat3* mat);
 float mat4det(const Mat4* mat);
 
-Mat3 mat3inv(const Mat3* mat);
-Mat4 mat4inv(const Mat4* mat);
+M_BOOL mat3inv(const Mat3* mat,Mat3* output);
+M_BOOL mat4inv(const Mat4* mat,Mat4* output);
 
 
 Mat3 mulm3m3(const Mat3* lhs,const Mat3* rhs);
@@ -74,7 +78,7 @@ Mat4 mat4rotatex(float angle);
 
 Mat4 mat4scale(float x,float y,float z);
 
-//Mat4 mat4perspect(float aspect,float near,float far,float fov);
+Mat4 mat4perspect(float aspect,float near,float far,float fov);
 
 //translate a vector3 value as a point by a 4x4 transform matrix
 Vector3 trans3point(const Mat4* mat,Vector3 v);
