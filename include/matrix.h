@@ -49,6 +49,9 @@ float mat4det(const Mat4* mat);
 M_BOOL mat3inv(const Mat3* mat,Mat3* output);
 M_BOOL mat4inv(const Mat4* mat,Mat4* output);
 
+void mat4transpose(const Mat4* mat,Mat4* output);
+void mat3transpose(const Mat3* mat,Mat3* output);
+
 
 Mat3 mulm3m3(const Mat3* lhs,const Mat3* rhs);
 Vector3 mulm33(const Mat3* lhs,Vector3 v);

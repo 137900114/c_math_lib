@@ -431,3 +431,16 @@ Mat4 mat4perspect(float aspect,float near,float far,float fov){
                  0.                        ,0.                     ,far / (far - near),near * far / (near - far),
                  0.                        ,0.                     ,1.                ,0.);
 }
+
+void mat4transpose(const Mat4* mat,Mat4* target){
+    target->a[0][0] = mat->a[0][0],target->a[0][1] = mat->a[1][0],target->a[0][2] = mat->a[2][0],target->a[0][3] = mat->a[3][0];
+    target->a[1][0] = mat->a[0][1],target->a[1][1] = mat->a[1][1],target->a[1][2] = mat->a[2][1],target->a[1][3] = mat->a[3][1];
+    target->a[2][0] = mat->a[0][2],target->a[2][1] = mat->a[1][2],target->a[2][2] = mat->a[2][2],target->a[2][3] = mat->a[3][2];
+    target->a[3][0] = mat->a[0][3],target->a[3][1] = mat->a[1][3],target->a[3][2] = mat->a[2][3],target->a[3][3] = mat->a[3][3];
+}
+
+void mat3transpose(const Mat3* mat,Mat3* target){
+    target->a[0][0] = mat->a[0][0],target->a[0][1] = mat->a[1][0],target->a[0][2] = mat->a[2][0];
+    target->a[1][0] = mat->a[0][1],target->a[1][1] = mat->a[1][1],target->a[1][2] = mat->a[2][1];
+    target->a[2][0] = mat->a[0][2],target->a[2][1] = mat->a[1][2],target->a[2][2] = mat->a[2][2];
+}
