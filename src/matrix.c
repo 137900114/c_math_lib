@@ -330,6 +330,12 @@ Mat4 mat4pos(float x,float y,float z){
                  0.f,0.f,1.f,z  ,
                  0.f,0.f,0.f,1.f);
 }
+Mat4 mat4posv(Vector3* pos){
+    return mat4n(1.f,0.f,0.f,pos->x  ,
+                 0.f,1.f,0.f,pos->y  ,
+                 0.f,0.f,1.f,pos->z  ,
+                 0.f,0.f,0.f,1.f);
+}
 
 Mat4 mat4rotatex(float x){
     float ca = cosf(x * PI / 180.),sa = sinf(x * PI / 180.);
@@ -357,11 +363,25 @@ Mat4 mat4rotatez(float x){
                  0.f,0.f,0.f,1.f);
 }
 
+inline Mat4 mat4rotatev(Vector3* rotate){
+    Mat4 X = mat4rotatex(rotate->x),Y = mat4rotatey(rotate->y),Z = mat4rotatez(rotate->z);
+    Y = mulm4m4(&Y,&Z);
+    return mulm4m4(&X,&Y);
+}
 //we use ZYX euler angle system
 inline Mat4 mat4rotate(float eulerx,float eulery,float eulerz){
     Mat4 X = mat4rotatex(eulerx),Y = mat4rotatey(eulery),Z = mat4rotatez(eulerz);
     Y = mulm4m4(&Y,&Z);
     return mulm4m4(&X,&Y);
+}
+
+Mat4 mat4scalev(Vector3* scale){
+    return mat4n(
+        scale->x  ,0.f,0.f,0.f,
+        0.f,scale->y  ,0.f,0.f,
+        0.f,0.f,scale->z  ,0.f,
+        0.f,0.f,0.f,1.f
+    );
 }
 Mat4 mat4scale(float x,float y,float z){
     return mat4n(

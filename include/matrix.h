@@ -69,14 +69,17 @@ Vector2 trans2point(const Mat3* mat,Vector2 v);
 Vector2 trans2vec(const Mat3* mat,Vector2 v);
 
 Mat4 mat4pos(float x,float y,float z);
+Mat4 mat4posv(Vector3* pos);
 //we use ZYX euler angle system
 Mat4 mat4rotate(float eulerx,float eulery,float eulerz);
+Mat4 mat4rotatev(Vector3* rotate);
 
 Mat4 mat4rotatez(float angle);
 Mat4 mat4rotatey(float angle);
 Mat4 mat4rotatex(float angle);
 
 Mat4 mat4scale(float x,float y,float z);
+Mat4 mat4scalev(Vector3* scale);
 
 Mat4 mat4perspect(float aspect,float near,float far,float fov);
 
